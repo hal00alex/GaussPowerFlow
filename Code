@@ -1,0 +1,78 @@
+import cmath
+import math
+def series (list_a):
+    #series of Vn 
+    sum_1 = 0
+    for i in range (len(list_a)): 
+        sum_1 = sum_1 + list_a[i] 
+    y = 1
+    return(sum_1) 
+
+def main():
+    #when using imaginary numbers in addmiatnce matrix
+    #please place the constant first and use "j" instead of "i"
+    #this needs better values/test case
+    #stick with admittance and make sure all variables follow 
+    admittance = [[-20j,10j],[10j,-20j]]
+    print (admittance)
+
+    #set voltage init to 1's
+    list_vn = [1,1]
+    old_vn = list_vn
+    new_vn = list_vn
+    list_delta = [0, 0] 
+
+    #given Pk, shold be a list/vetor 
+    Pk = [1,1.5] 
+    change = 1
+    #q[1] is a given
+    q = [0,.01]
+    change = [1,1]
+    Iter=0
+    #add an outer loop that stops changing vn_new once changes are small
+    #check both
+    while (change[0] > .01 or change[1] > .01):
+        if(Iter == 20):
+            break
+    #does it matter which bus I use to compare
+    #need to update delat
+        for i in range (len(old_vn)):
+            #solve for q at bus k
+            #if possible try to get into degrees
+            #seperate the buses p's and q's 
+            list_delta[0] = (cmath.atan(new_vn[0].imag/new_vn[0].real))-(cmath.atan(new_vn[1].imag/new_vn[1].real))
+            list_delta[0] = math.degrees(list_delta[0].real)
+            print("\nangle check",list_delta[0]) 
+            #q[0] = (old_vn[0]*admittance[0][0])*cmath.sin(list_delta[0])
+            #q[0] = q[0] + (old_vn[1]*admittance[0][1])*cmath.sin(list_delta[1]-(cmath.atan(old_vn[0].imag/old_vn[0].real)-cmath.atan(old_vn[1].imag/old_vn[1].real)))
+            #q[0] = q[0] * old_vn[0]
+            q[0] = -(old_vn[0].conjugate()*(admittance[0][0]*old_vn[0] + admittance[0][1]*old_vn[1])).imag
+            print ("\ncomplex check",q)
+            #create the terms 
+            first_term = 1/admittance[i][i]
+            second_term = Pk[i] - (q[i]*1j) 
+            second_term = second_term / (old_vn[i].conjugate())
+            #not quiet 5sure this factorization works out correctly
+            #need to redo because expanison is incorrect 
+            if (i == 0):
+                third_term = old_vn[1]*admittance[0][1]
+            if(i == 1):
+                third_term = old_vn[0]*admittance[1][0] 
+        
+            #print(new_vn)
+            new_vn[i] = first_term * (second_term - third_term) 
+        change[0] = abs(old_vn[0] - new_vn[0])
+        change[1] = abs(old_vn[1] - new_vn[1]) 
+        old_vn = new_vn
+        Iter=Iter+1
+    print(new_vn)
+    #print new_vn in polar
+    print(cmath.polar(new_vn[0]))
+    print(cmath.polar(new_vn[1]))
+    print(q)
+    print(change)
+    print(Iter)
+    #calculate P and Q
+    #P = 
+
+main() 
